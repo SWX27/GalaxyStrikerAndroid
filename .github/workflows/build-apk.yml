@@ -1,47 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
 
-name: Build Galaxy Striker APK
+def automaticVersionCode = providers.gradleProperty("versionCode")
+        .orElse("1")
+        .get()
+        .toInteger()
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+def automaticVersionName = providers.gradleProperty("versionName")
+        .orElse("1.0.0")
+        .get()
 
-permissions:
-  contents: read
+def signingKeyPath = System.getenv("KEYSTORE_PATH")
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+def signingKeyPassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+def signingAlias = System.getenv("KEY_ALIAS") ?: "galaxystriker"
+def signingPassword = System.getenv("KEY_PASSWORD") ?: ""
 
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+android {
+    namespace 'com.galaxystriker.game'
+    compileSdk 35
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+    defaultConfig {
+        applicationId 'com.galaxystriker.game'
+        minSdk 23
+        targetSdk 28
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        versionCode automaticVersionCode
+        versionName automaticVersionName
+    }
 
-      - name: Build APK
-        run: |
-          gradle assembleDebug \
-            -PversionCode=${{ github.run_number }} \
-            -PversionName=1.0.${{ github.run_number }}
+    signingConfigs {
+        release {
+            storeFile file(signingKeyPath ?: "${rootDir}/galaxy-striker-release.jks")
+            storePassword signingKeyPassword
+            keyAlias signingAlias
+            keyPassword signingPassword
+        }
+    }
 
-      - name: Rename APK
-        run: |
-          cp app/build/outputs/apk/debug/app-debug.apk \
-             "app/build/outputs/apk/debug/Galaxy-Striker-v1.0.${{ github.run_number }}.apk"
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Galaxy-Striker-v1.0.${{ github.run_number }}
-          path: app/build/outputs/apk/debug/Galaxy-Striker-v1.0.${{ github.run_number }}.apk
-          if-no-files-found: error
-          retention-days: 30
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+}
