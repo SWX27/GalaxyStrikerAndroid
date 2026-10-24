@@ -1,4 +1,3 @@
-
 plugins {
     id 'com.android.application'
 }
@@ -12,6 +11,12 @@ def automaticVersionName = providers.gradleProperty("versionName")
         .orElse("1.0.0")
         .get()
 
+def signingKeyPath = System.getenv("KEYSTORE_PATH")
+
+def signingKeyPassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+def signingAlias = System.getenv("KEY_ALIAS") ?: "galaxystriker"
+def signingPassword = System.getenv("KEY_PASSWORD") ?: ""
+
 android {
     namespace 'com.galaxystriker.game'
     compileSdk 35
@@ -23,5 +28,21 @@ android {
 
         versionCode automaticVersionCode
         versionName automaticVersionName
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(signingKeyPath ?: "${rootDir}/galaxy-striker-release.jks")
+            storePassword signingKeyPassword
+            keyAlias signingAlias
+            keyPassword signingPassword
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
     }
 }
