@@ -24,10 +24,4 @@ android {
         versionCode automaticVersionCode
         versionName automaticVersionName
     }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
-        }
-    }
 }
