@@ -1,3 +1,4 @@
+
 name: Build Galaxy Striker APK
 
 on:
@@ -26,39 +27,21 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Decode stable release keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      - name: Build Debug APK
         run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "Missing GitHub Actions secret: KEYSTORE_BASE64"
-            exit 1
-          fi
-          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/galaxy-striker-release.jks"
-          echo "KEYSTORE_PATH=$RUNNER_TEMP/galaxy-striker-release.jks" >> "$GITHUB_ENV"
-
-      - name: Build signed release APK
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          test -n "$KEYSTORE_PASSWORD" || { echo "Missing KEYSTORE_PASSWORD secret"; exit 1; }
-          test -n "$KEY_ALIAS" || { echo "Missing KEY_ALIAS secret"; exit 1; }
-          test -n "$KEY_PASSWORD" || { echo "Missing KEY_PASSWORD secret"; exit 1; }
-          gradle assembleRelease \
+          gradle assembleDebug \
             -PversionCode=${{ github.run_number }} \
             -PversionName=1.0.${{ github.run_number }}
 
       - name: Rename APK
         run: |
-          cp app/build/outputs/apk/release/app-release.apk \
-             "app/build/outputs/apk/release/Galaxy-Striker-v1.0.${{ github.run_number }}.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "app/build/outputs/apk/debug/Galaxy-Striker-v1.0.${{ github.run_number }}.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Galaxy-Striker-v1.0.${{ github.run_number }}
-          path: app/build/outputs/apk/release/Galaxy-Striker-v1.0.${{ github.run_number }}.apk
+          path: app/build/outputs/apk/debug/Galaxy-Striker-v1.0.${{ github.run_number }}.apk
           if-no-files-found: error
           retention-days: 30
