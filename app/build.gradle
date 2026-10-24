@@ -3,6 +3,15 @@ plugins {
     id 'com.android.application'
 }
 
+def automaticVersionCode = providers.gradleProperty("versionCode")
+        .orElse("1")
+        .get()
+        .toInteger()
+
+def automaticVersionName = providers.gradleProperty("versionName")
+        .orElse("1.0.0")
+        .get()
+
 android {
     namespace 'com.galaxystriker.game'
     compileSdk 35
@@ -11,7 +20,8 @@ android {
         applicationId 'com.galaxystriker.game'
         minSdk 23
         targetSdk 28
-        versionCode 1
-        versionName '1.0'
+
+        versionCode automaticVersionCode
+        versionName automaticVersionName
     }
 }
