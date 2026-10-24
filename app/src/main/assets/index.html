@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,80 +6,94 @@
 <meta name="theme-color" content="#030613">
 <title>GALAXY STRIKER</title>
 <style>
+:root{color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030613;color:#fff;font-family:Arial,sans-serif;touch-action:none}
-canvas{display:block;width:100%;height:100%;position:absolute;inset:0}
-#hud{position:absolute;top:max(12px,env(safe-area-inset-top));left:10px;right:10px;display:flex;justify-content:space-between;gap:6px;font-size:clamp(10px,2.8vw,14px);font-weight:bold;pointer-events:none}
-.panel{background:linear-gradient(135deg,#0b1c32ee,#071020ee);border:1px solid #287da0;border-radius:13px;padding:9px 10px;box-shadow:0 0 15px #00cfff17;text-shadow:0 0 8px #0ff;line-height:1.55}
-#pause{position:absolute;right:12px;top:78px;z-index:3;width:auto;margin:0;padding:9px 13px;background:#091a30dd;color:#8ff;border:1px solid #287da0;border-radius:10px;font-size:13px}
-#hint{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:10px;right:10px;text-align:center;font-size:clamp(10px,2.7vw,13px);color:#9ab4d2;pointer-events:none;text-shadow:0 0 8px #00cfff}
-#overlay{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#08254bdc,#020611f5 72%);padding:22px}
-.card{text-align:center;max-width:370px;width:100%;padding:27px 20px;background:linear-gradient(160deg,#0d2040f5,#050d20f5);border:1px solid #25cfff;border-radius:22px;box-shadow:0 0 35px #006aff40,inset 0 0 25px #0ab8ff0b}
-.logo{font-size:clamp(30px,8vw,43px);font-weight:900;line-height:1.02;letter-spacing:2px;color:#8ff7ff;text-shadow:0 0 8px #00d9ff,0 0 28px #008cff}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#030613;color:#fff;font-family:Arial,sans-serif;touch-action:none}
+body{height:100dvh;overscroll-behavior:none}
+canvas{display:block;position:fixed;inset:0;width:100vw;height:100%;height:100dvh;touch-action:none}
+#hud{position:fixed;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;z-index:2;display:none;justify-content:space-between;align-items:flex-start;gap:6px;font-size:clamp(10px,2.8vw,14px);font-weight:bold;pointer-events:none}
+.panel{background:linear-gradient(135deg,#0b1c32ee,#071020ee);border:1px solid #287da0;border-radius:13px;padding:9px 10px;box-shadow:0 0 15px #00cfff17;text-shadow:0 0 8px #0ff;line-height:1.55;white-space:nowrap}
+#pause{position:fixed;right:12px;top:max(78px,calc(env(safe-area-inset-top) + 65px));z-index:4;display:none;width:auto;margin:0;padding:10px 13px;background:#091a30eF;color:#8ff;border:1px solid #287da0;border-radius:10px;font-size:clamp(12px,3vw,14px)}
+#hint{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:10px;right:10px;z-index:2;display:none;text-align:center;font-size:clamp(10px,2.7vw,13px);color:#9ab4d2;pointer-events:none;text-shadow:0 0 8px #00cfff}
+#overlay{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#08254bdc,#020611f5 72%);padding:max(14px,env(safe-area-inset-top)) 18px max(14px,env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain}
+.card{text-align:center;max-width:370px;width:100%;margin:auto;padding:clamp(18px,4vh,27px) 20px;background:linear-gradient(160deg,#0d2040f5,#050d20f5);border:1px solid #25cfff;border-radius:22px;box-shadow:0 0 35px #006aff40,inset 0 0 25px #0ab8ff0b}
+.logo{font-size:clamp(30px,8vw,43px);font-weight:900;line-height:1.02;letter-spacing:2px;color:#8ff7ff;text-shadow:0 0 8px #00d9ff,0 0 28px #008cff;margin:.55em 0}
 .subtitle{margin:12px 0 18px;color:#9db8dc;font-size:12px;letter-spacing:3px}
 .tag{display:inline-block;border:1px solid #1a587a;border-radius:99px;padding:6px 12px;color:#5eeeff;font-size:11px;letter-spacing:1px;margin-bottom:14px}
 p{color:#c1d7f2;line-height:1.6;font-size:14px;margin:12px 0 18px}
-button{cursor:pointer;background:linear-gradient(100deg,#36eaff,#08a9e6);color:#00101b;border:0;border-radius:11px;padding:15px 18px;font-size:15px;font-weight:900;width:100%;margin-top:10px;box-shadow:0 0 18px #00cfff30}
-button:active{transform:scale(.98)}
+button{font-family:inherit;cursor:pointer;background:linear-gradient(100deg,#36eaff,#08a9e6);color:#00101b;border:0;border-radius:11px;padding:14px 18px;font-size:15px;font-weight:900;width:100%;margin-top:10px;box-shadow:0 0 18px #00cfff30;touch-action:manipulation}
+button:active{transform:scale(.985)}
 .secondary{background:#0b1b32;color:#9eeeff;border:1px solid #286888;box-shadow:none}
-#mini{color:#7294bb;font-size:11px;line-height:1.9;margin-top:17px}
-#bossbar{position:absolute;top:91px;left:20%;right:20%;height:7px;background:#35172f;border:1px solid #a23b91;border-radius:9px;overflow:hidden;display:none}
-#bossfill{height:100%;width:100%;background:linear-gradient(90deg,#ff4bd6,#ff3e72);transition:width .1s}
-@media(max-height:500px){.card{padding:15px}.logo{font-size:28px}.subtitle{margin:6px}.tag{margin-bottom:4px}p{margin:7px 0;font-size:12px}button{padding:10px;margin-top:5px}#mini{margin-top:6px}}
+#third{display:none}
+#mini{color:#7294bb;font-size:11px;line-height:1.9;margin-top:15px}
+#bossbar{position:fixed;z-index:3;top:max(91px,calc(env(safe-area-inset-top) + 78px));left:20%;right:20%;height:7px;background:#35172f;border:1px solid #a23b91;border-radius:9px;overflow:hidden;display:none}
+#bossfill{height:100%;width:100%;background:linear-gradient(90deg,#ff4bd6,#ff3e72);transition:width .1s linear}
+@media(max-height:520px){#overlay{align-items:flex-start}.card{padding:13px 16px}.logo{font-size:28px;margin:7px}.subtitle{margin:6px}.tag{margin-bottom:4px}p{margin:7px 0;font-size:12px}button{padding:9px;margin-top:5px}#mini{margin-top:6px}#pause{top:66px}}
 </style>
 </head>
 <body>
-<canvas id="game"></canvas>
-
+<canvas id="game" aria-label="Galaxy Striker game"></canvas>
 <div id="hud">
  <div class="panel">LEVEL <span id="level">1</span>/10<br>SCORE <span id="score">0</span></div>
  <div class="panel">HULL <span id="hp">100</span>%<br>WEAPON <span id="weapon">1</span></div>
  <div class="panel">ENEMIES <span id="left">0</span></div>
 </div>
-
-<button id="pause" style="display:none">Ⅱ PAUSE</button>
+<button id="pause" type="button">Ⅱ PAUSE</button>
 <div id="bossbar"><div id="bossfill"></div></div>
-
 <div id="overlay">
  <div class="card">
   <div class="tag" id="tag">★ SPACE COMBAT SYSTEM ★</div>
   <h1 class="logo" id="title">GALAXY<br>STRIKER</h1>
   <div class="subtitle" id="subtitle">DEFEND THE GALAXY</div>
   <p id="message">Survive 10 levels. Defeat powerful bosses and upgrade your weapons to save the galaxy.</p>
-  <button id="start">▶ START MISSION</button>
-  <button id="secondary" class="secondary">HOW TO PLAY</button>
+  <button id="start" type="button">▶ START MISSION</button>
+  <button id="secondary" class="secondary" type="button">HOW TO PLAY</button>
+  <button id="third" class="secondary" type="button">MAIN MENU</button>
   <div id="mini">10 LEVELS • 2 BOSSES • 3 WEAPON TIERS</div>
  </div>
 </div>
-
 <div id="hint">DRAG TO MOVE • AUTO FIRE • COLLECT CYAN UPGRADES</div>
-
 <script>
 (()=>{
 'use strict';
 
 const canvas=document.getElementById('game');
-const ctx=canvas.getContext('2d');
+const ctx=canvas.getContext('2d',{alpha:false});
 const $=id=>document.getElementById(id);
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 
-let W=0,H=0,dpr=1;
-let mode='menu',level=1,score=0,hp=100,weapon=1;
+let W=1,H=1,dpr=1;
+let mode='menu';
+let level=1,score=0,hp=100,weapon=1;
 let ship=null,stars=[],bullets=[],enemies=[],drops=[],particles=[];
 let spawn=0,frame=0,boss=null,last=0,drag=false;
 let waveSpawned=0,waveLimit=0,levelTransition=0;
-let best=0,soundOn=true,audio=null;
+let best=0,rafId=0;
 
-try{best=Number(localStorage.getItem('gs_best')||0)}catch(e){}
+try{best=Number(localStorage.getItem('gs_best')||0)||0}catch(_){best=0}
+
+function viewportSize(){
+ const rect=canvas.getBoundingClientRect();
+ return {
+  width:Math.max(1,rect.width||window.innerWidth||1),
+  height:Math.max(1,rect.height||window.innerHeight||1)
+ };
+}
 
 function resize(){
- dpr=Math.min(window.devicePixelRatio||1,2);
- W=innerWidth;H=innerHeight;
- canvas.width=Math.floor(W*dpr);
- canvas.height=Math.floor(H*dpr);
+ const size=viewportSize();
+ W=size.width;H=size.height;
+ dpr=Math.min(Math.max(1,window.devicePixelRatio||1),2);
+ const pixelW=Math.max(1,Math.round(W*dpr));
+ const pixelH=Math.max(1,Math.round(H*dpr));
+ if(canvas.width!==pixelW)canvas.width=pixelW;
+ if(canvas.height!==pixelH)canvas.height=pixelH;
  ctx.setTransform(dpr,0,0,dpr,0,0);
  if(ship){
-  ship.x=Math.min(W-20,Math.max(20,ship.x));
-  ship.y=Math.min(H-55,Math.max(100,ship.y));
+  const minX=Math.min(18,W/2),maxX=Math.max(minX,W-18);
+  const minY=Math.min(70,H/2),maxY=Math.max(minY,H-40);
+  ship.x=clamp(ship.x,minX,maxX);
+  ship.y=clamp(ship.y,minY,maxY);
  }
  stars=Array.from({length:Math.max(45,Math.floor(W*H/8500))},()=>({
   x:Math.random()*W,y:Math.random()*H,
@@ -88,26 +101,36 @@ function resize(){
  }));
  draw();
 }
-addEventListener('resize',resize);
+window.addEventListener('resize',resize,{passive:true});
+window.addEventListener('orientationchange',()=>setTimeout(resize,100),{passive:true});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',resize,{passive:true});
+
+function stopLoop(){
+ if(rafId){cancelAnimationFrame(rafId);rafId=0;}
+}
+function scheduleLoop(){
+ if(!rafId&&mode==='playing')rafId=requestAnimationFrame(loop);
+}
 
 function reset(){
  level=1;score=0;hp=100;weapon=1;frame=0;
  bullets=[];enemies=[];drops=[];particles=[];
  boss=null;spawn=0;waveSpawned=0;levelTransition=0;
- ship={x:W/2,y:H*.78,r:15,cool:0,inv:0};
+ const minX=Math.min(18,W/2),maxX=Math.max(minX,W-18);
+ const minY=Math.min(70,H/2),maxY=Math.max(minY,H-40);
+ ship={x:clamp(W/2,minX,maxX),y:clamp(H*.78,minY,maxY),r:15,cool:0,inv:0};
  startLevel();
  updateHud();
 }
 
 function startLevel(){
  enemies=[];bullets=[];drops=[];boss=null;
- waveSpawned=0;levelTransition=0;
- spawn=35;
- waveLimit=level===5?0:level===10?0:5+level*2;
+ waveSpawned=0;levelTransition=0;spawn=35;
+ waveLimit=(level===5||level===10)?0:5+level*2;
  $('bossbar').style.display=(level===5||level===10)?'block':'none';
  if(level===5||level===10){
-  boss={x:W/2,y:105,hp:level===10?150:75,
-   max:level===10?150:75,t:0,shot:0};
+  const bossHp=level===10?150:75;
+  boss={x:W/2,y:Math.min(105,H*.2),hp:bossHp,max:bossHp,t:0,shot:0};
  }
  updateHud();
 }
@@ -117,102 +140,93 @@ function updateHud(){
  $('score').textContent=score;
  $('hp').textContent=Math.max(0,Math.ceil(hp));
  $('weapon').textContent=weapon;
- $('left').textContent=enemies.length+(boss?1:0);
- if(boss){
-  $('bossfill').style.width=Math.max(0,boss.hp/boss.max*100)+'%';
- }
+ $('left').textContent=enemies.filter(e=>!e.dead).length+(boss?1:0);
+ if(boss)$('bossfill').style.width=clamp(boss.hp/boss.max*100,0,100)+'%';
 }
 
-function showMenu(title,subtitle,msg,button,secondary,mini){
+function showOverlay(title,subtitle,message,startText,secondaryText,mini,thirdText=''){
  $('title').innerHTML=title;
  $('subtitle').textContent=subtitle;
- $('message').textContent=msg;
- $('start').textContent=button;
- $('secondary').textContent=secondary;
+ $('message').textContent=message;
+ $('start').textContent=startText;
+ $('secondary').textContent=secondaryText;
  $('mini').textContent=mini;
+ $('third').textContent=thirdText;
+ $('third').style.display=thirdText?'block':'none';
  $('tag').style.display='inline-block';
  $('overlay').style.display='flex';
+ $('hud').style.display='none';
  $('pause').style.display='none';
+ $('hint').style.display='none';
+ if(mode!=='playing')$('bossbar').style.display='none';
+}
+
+function showMainMenu(){
+ stopLoop();drag=false;mode='menu';ship=null;boss=null;
+ bullets=[];enemies=[];drops=[];particles=[];
+ $('bossbar').style.display='none';
+ showOverlay('GALAXY<br>STRIKER','DEFEND THE GALAXY',
+  'Survive 10 levels. Defeat powerful bosses and upgrade your weapons to save the galaxy.',
+  '▶ START MISSION','HOW TO PLAY',
+  '10 LEVELS • 2 BOSSES • 3 WEAPON TIERS');
+ draw();
+}
+
+function showHowTo(){
+ stopLoop();drag=false;mode='howto';
+ showOverlay('HOW TO<br>PLAY','FLIGHT MANUAL',
+  'Drag anywhere in the play area to steer. Your ship fires automatically. Collect cyan power-ups to restore hull and improve your weapon. Survive all 10 levels!',
+  '▶ START MISSION','BACK TO MENU',
+  'TIP: KEEP MOVING TO AVOID ENEMIES');
+ draw();
+}
+
+function showPaused(){
+ if(mode!=='playing')return;
+ mode='paused';stopLoop();drag=false;
+ showOverlay('MISSION<br>PAUSED','TAKE A BREATHER',
+  'Your mission is on hold. Continue when you are ready.',
+  '▶ RESUME MISSION','RESTART MISSION',
+  'CURRENT LEVEL: '+level+' • SCORE: '+score,'MAIN MENU');
+ draw();
+}
+
+function resumeGame(){
+ if(mode!=='paused')return;
+ mode='playing';
+ $('overlay').style.display='none';
+ $('hud').style.display='flex';
+ $('pause').style.display='block';
+ $('pause').textContent='Ⅱ PAUSE';
  $('hint').style.display='block';
+ $('bossbar').style.display=boss?'block':'none';
+ last=performance.now();
+ scheduleLoop();
 }
 
 function startGame(){
- reset();
- mode='playing';
+ stopLoop();reset();mode='playing';drag=false;
  $('overlay').style.display='none';
+ $('hud').style.display='flex';
  $('pause').style.display='block';
  $('pause').textContent='Ⅱ PAUSE';
- last=performance.now();
- requestAnimationFrame(loop);
+ $('hint').style.display='block';
+ last=performance.now();draw();scheduleLoop();
 }
 
-$('start').onclick=()=>{
- if(mode==='menu'||mode==='gameover'||mode==='won')startGame();
- else if(mode==='paused'){
-  mode='playing';
-  $('overlay').style.display='none';
-  $('pause').textContent='Ⅱ PAUSE';
-  last=performance.now();
-  requestAnimationFrame(loop);
- }
-};
-
-$('secondary').onclick=()=>{
- if(mode==='menu'){
-  showMenu('HOW TO<br>PLAY','FLIGHT MANUAL',
-   'Drag anywhere on the screen to steer. Your ship fires automatically. Collect cyan power-ups to restore hull and improve your weapon. Survive all 10 levels!',
-   '▶ START MISSION','BACK TO MENU',
-   'TIP: MOVE AWAY FROM RED ENEMIES');
-  $('secondary').onclick=()=>{
-   showMenu('GALAXY<br>STRIKER','DEFEND THE GALAXY',
-    'Survive 10 levels. Defeat powerful bosses and upgrade your weapons to save the galaxy.',
-    '▶ START MISSION','HOW TO PLAY',
-    '10 LEVELS • 2 BOSSES • 3 WEAPON TIERS');
-   $('secondary').onclick=showHowTo;
-  };
- }else{
-  showMenu('GALAXY<br>STRIKER','DEFEND THE GALAXY',
-   'Survive 10 levels. Defeat powerful bosses and upgrade your weapons to save the galaxy.',
-   '▶ START MISSION','HOW TO PLAY',
-   '10 LEVELS • 2 BOSSES • 3 WEAPON TIERS');
-  $('secondary').onclick=showHowTo;
- }
-};
-
-function showHowTo(){
- showMenu('HOW TO<br>PLAY','FLIGHT MANUAL',
-  'Drag anywhere on the screen to steer. Your ship fires automatically. Collect cyan power-ups to restore hull and improve your weapon. Survive all 10 levels!',
-  '▶ START MISSION','BACK TO MENU',
-  'TIP: MOVE AWAY FROM RED ENEMIES');
- $('secondary').onclick=()=>{
-  showMenu('GALAXY<br>STRIKER','DEFEND THE GALAXY',
-   'Survive 10 levels. Defeat powerful bosses and upgrade your weapons to save the galaxy.',
-   '▶ START MISSION','HOW TO PLAY',
-   '10 LEVELS • 2 BOSSES • 3 WEAPON TIERS');
-  $('secondary').onclick=showHowTo;
- };
-}
-$('secondary').onclick=showHowTo;
-
-$('pause').onclick=()=>{
- if(mode==='playing'){
-  mode='paused';
-  showMenu('MISSION<br>PAUSED','TAKE A BREATHER',
-   'Your mission is on hold. Continue when you are ready.',
-   '▶ RESUME MISSION','RESTART MISSION',
-   'CURRENT LEVEL: '+level+' • SCORE: '+score);
-  $('pause').style.display='none';
-  $('start').onclick=()=>{
-   mode='playing';
-   $('overlay').style.display='none';
-   $('pause').style.display='block';
-   $('pause').textContent='Ⅱ PAUSE';
-   last=performance.now();
-   requestAnimationFrame(loop);
-  };
-  $('secondary').onclick=startGame;
- }
-};
+$('start').addEventListener('click',()=>{
+ if(mode==='paused')resumeGame();
+ else startGame();
+});
+$('secondary').addEventListener('click',()=>{
+ if(mode==='menu'||mode==='gameover'||mode==='won')showHowTo();
+ else if(mode==='howto')showMainMenu();
+ else if(mode==='paused')startGame();
+});
+$('third').addEventListener('click',()=>{
+ if(mode==='paused')showMainMenu();
+});
+$('pause').addEventListener('click',showPaused);
 
 function pos(e){
  const r=canvas.getBoundingClientRect();
@@ -220,84 +234,71 @@ function pos(e){
 }
 canvas.addEventListener('pointerdown',e=>{
  if(mode!=='playing'||!ship)return;
- drag=true;
- const p=pos(e);
- ship.x=Math.max(18,Math.min(W-18,p.x));
- ship.y=Math.max(70,Math.min(H-40,p.y));
+ drag=true;const p=pos(e);
+ const minX=Math.min(18,W/2),maxX=Math.max(minX,W-18);
+ const minY=Math.min(70,H/2),maxY=Math.max(minY,H-40);
+ ship.x=clamp(p.x,minX,maxX);ship.y=clamp(p.y,minY,maxY);
  try{canvas.setPointerCapture(e.pointerId)}catch(_){}
 });
 canvas.addEventListener('pointermove',e=>{
  if(!drag||mode!=='playing'||!ship)return;
  const p=pos(e);
- ship.x=Math.max(18,Math.min(W-18,p.x));
- ship.y=Math.max(70,Math.min(H-40,p.y));
+ const minX=Math.min(18,W/2),maxX=Math.max(minX,W-18);
+ const minY=Math.min(70,H/2),maxY=Math.max(minY,H-40);
+ ship.x=clamp(p.x,minX,maxX);ship.y=clamp(p.y,minY,maxY);
 });
 function release(){drag=false}
 canvas.addEventListener('pointerup',release);
 canvas.addEventListener('pointercancel',release);
+canvas.addEventListener('lostpointercapture',release);
 
 function burst(x,y,color,n=8){
- for(let i=0;i<n;i++){
-  particles.push({
-   x,y,vx:(Math.random()-.5)*4,
-   vy:(Math.random()-.5)*4,
-   life:20+Math.random()*22,color
-  });
- }
+ for(let i=0;i<n;i++)particles.push({
+  x,y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,
+  life:20+Math.random()*22,color
+ });
 }
-
 function shoot(){
  if(!ship)return;
  const offsets=weapon>=3?[-12,0,12]:weapon===2?[-7,7]:[0];
- offsets.forEach(dx=>bullets.push({
-  x:ship.x+dx,y:ship.y-18,v:8,r:3,damage:1
- }));
+ offsets.forEach(dx=>bullets.push({x:ship.x+dx,y:ship.y-18,v:8,r:3,damage:1,dead:false}));
 }
-
 function makeEnemy(){
  enemies.push({
-  x:20+Math.random()*Math.max(1,W-40),
-  y:-25,hp:level>=7?3:level>=4?2:1,
-  r:10+Math.random()*5,
-  v:1+level*.16+Math.random()*.6,
-  t:Math.random()*6,dead:false
+  x:20+Math.random()*Math.max(1,W-40),y:-25,
+  hp:level>=7?3:level>=4?2:1,r:10+Math.random()*5,
+  v:1+level*.16+Math.random()*.6,t:Math.random()*6,dead:false
  });
 }
-
-function damage(amount){
- if(!ship||ship.inv>0)return;
- hp-=amount;ship.inv=35;
- burst(ship.x,ship.y,'#ff496e',12);
- if(hp<=0){
-  hp=0;mode='gameover';
-  try{if(score>best){best=score;localStorage.setItem('gs_best',best)}}catch(_){}
-  updateHud();
-  $('bossbar').style.display='none';
-  showMenu('MISSION<br>FAILED','SIGNAL LOST',
-   'Score: '+score+' • Level reached: '+level+' • Best: '+best,
-   '↻ TRY AGAIN','HOW TO PLAY',
-   'REPAIR YOUR SHIP AND TRY AGAIN');
-  $('start').onclick=startGame;
-  $('secondary').onclick=showHowTo;
- }
+function saveBest(){
+ if(score>best){best=score;try{localStorage.setItem('gs_best',String(best))}catch(_){}}
 }
-
+function gameOver(){
+ if(mode!=='playing')return;
+ hp=0;saveBest();mode='gameover';stopLoop();drag=false;
+ $('bossbar').style.display='none';
+ updateHud();
+ showOverlay('MISSION<br>FAILED','SIGNAL LOST',
+  'Score: '+score+' • Level reached: '+level+' • Best: '+best,
+  '↻ TRY AGAIN','HOW TO PLAY','REPAIR YOUR SHIP AND TRY AGAIN');
+ draw();
+}
+function damage(amount){
+ if(!ship||ship.inv>0||mode!=='playing')return;
+ hp-=amount;ship.inv=35;burst(ship.x,ship.y,'#ff496e',12);
+ if(hp<=0)gameOver();
+}
 function nextLevel(){
  if(mode!=='playing'||levelTransition>0)return;
- levelTransition=60;
- burst(W/2,H/2,'#51eaff',35);
+ levelTransition=60;burst(W/2,H/2,'#51eaff',35);
  level++;
  if(level>10){
-  level=10;mode='won';
-  try{if(score>best){best=score;localStorage.setItem('gs_best',best)}}catch(_){}
+  level=10;mode='won';stopLoop();saveBest();
   $('bossbar').style.display='none';
-  showMenu('GALAXY<br>SAVED!','MISSION COMPLETE',
+  showOverlay('GALAXY<br>SAVED!','MISSION COMPLETE',
    'You defeated the final boss! Final score: '+score+' • Best: '+best,
-   '▶ PLAY AGAIN','HOW TO PLAY',
-   'YOU ARE THE DEFENDER OF THE GALAXY');
-  $('start').onclick=startGame;
-  $('secondary').onclick=showHowTo;
-  return;
+   '▶ PLAY AGAIN','HOW TO PLAY','YOU ARE THE DEFENDER OF THE GALAXY');
+  draw();return;
  }
  hp=Math.min(100,hp+18);
  if(level===3||level===7)weapon=Math.min(3,weapon+1);
@@ -306,184 +307,127 @@ function nextLevel(){
 
 function update(dt){
  frame+=dt;
- stars.forEach(s=>{
-  s.y+=s.v*dt*2.2;
-  if(s.y>H){s.y=0;s.x=Math.random()*W}
- });
- if(!ship)return;
+ stars.forEach(s=>{s.y+=s.v*dt*2.2;if(s.y>H){s.y=0;s.x=Math.random()*W}});
+ if(!ship||mode!=='playing')return;
  if(ship.cool>0)ship.cool-=dt;
  if(ship.inv>0)ship.inv-=dt;
-
- if(ship.cool<=0){
-  shoot();ship.cool=Math.max(6,13-weapon*2);
- }
-
+ if(ship.cool<=0){shoot();ship.cool=Math.max(6,13-weapon*2)}
  if(levelTransition>0){
   levelTransition-=dt;
   if(levelTransition<=0&&mode==='playing')startLevel();
   updateHud();return;
  }
-
  if(!boss&&level!==5&&level!==10){
   spawn-=dt;
   if(spawn<=0&&waveSpawned<waveLimit&&enemies.length<Math.min(9,3+level)){
-   makeEnemy();
-   waveSpawned++;
-   spawn=Math.max(15,55-level*3);
+   makeEnemy();waveSpawned++;spawn=Math.max(15,55-level*3);
   }
  }
-
  bullets.forEach(b=>b.y-=b.v*dt);
  bullets=bullets.filter(b=>b.y>-25&&!b.dead);
-
  enemies.forEach(e=>{
-  e.y+=e.v*dt;
-  e.x+=Math.sin(frame*.04+e.t)*.8*dt;
+  if(e.dead||mode!=='playing')return;
+  e.y+=e.v*dt;e.x+=Math.sin(frame*.04+e.t)*.8*dt;
   if(e.y>H+20){e.dead=true;return}
-  if(Math.hypot(e.x-ship.x,e.y-ship.y)<e.r+ship.r){
-   e.dead=true;damage(12);
-  }
+  if(Math.hypot(e.x-ship.x,e.y-ship.y)<e.r+ship.r){e.dead=true;damage(12);if(mode!=='playing')return}
   bullets.forEach(b=>{
+   if(mode!=='playing'||e.dead)return;
    if(!b.dead&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){
-    b.dead=true;e.hp--;
-    burst(b.x,b.y,'#68eaff',3);
+    b.dead=true;e.hp--;burst(b.x,b.y,'#68eaff',3);
     if(e.hp<=0){
-     e.dead=true;score+=10;
-     burst(e.x,e.y,'#ff8b55',9);
+     e.dead=true;score+=10;burst(e.x,e.y,'#ff8b55',9);
      if(Math.random()<.2)drops.push({x:e.x,y:e.y,r:8,dead:false});
     }
    }
   });
  });
+ if(mode!=='playing')return;
  enemies=enemies.filter(e=>!e.dead);
-
  if(boss){
-  boss.t+=dt;
-  boss.x=W/2+Math.sin(boss.t*.025)*W*.3;
-  boss.y=80+Math.sin(boss.t*.05)*15;
+  boss.t+=dt;boss.x=W/2+Math.sin(boss.t*.025)*Math.max(0,W*.3);
+  boss.y=Math.min(80,H*.18)+Math.sin(boss.t*.05)*Math.min(15,H*.025);
   boss.shot+=dt;
   if(boss.shot>48){
    boss.shot=0;
-   enemies.push({
-    x:boss.x,y:boss.y+20,hp:1,r:7,
-    v:2.5+level*.1,t:Math.random()*6,dead:false
-   });
+   enemies.push({x:boss.x,y:boss.y+20,hp:1,r:7,v:2.5+level*.1,t:Math.random()*6,dead:false});
   }
   bullets.forEach(b=>{
-   if(!b.dead&&Math.hypot(b.x-boss.x,b.y-boss.y)<34){
-    b.dead=true;boss.hp--;
-    burst(b.x,b.y,'#ff4fda',2);
-   }
+   if(!b.dead&&Math.hypot(b.x-boss.x,b.y-boss.y)<34){b.dead=true;boss.hp--;burst(b.x,b.y,'#ff4fda',2)}
   });
   if(boss.hp<=0){
-   score+=level*100;
-   burst(boss.x,boss.y,'#ff4fda',45);
-   boss=null;
-   $('bossbar').style.display='none';
-   nextLevel();
+   score+=level*100;burst(boss.x,boss.y,'#ff4fda',45);boss=null;
+   $('bossbar').style.display='none';nextLevel();
+   if(mode!=='playing'){updateHud();return}
   }
  }
-
  drops.forEach(d=>{
+  if(d.dead)return;
   d.y+=2*dt;
   if(Math.hypot(d.x-ship.x,d.y-ship.y)<d.r+ship.r){
-   d.dead=true;weapon=Math.min(3,weapon+1);
-   hp=Math.min(100,hp+8);score+=25;
-   burst(d.x,d.y,'#4ff',10);
+   d.dead=true;weapon=Math.min(3,weapon+1);hp=Math.min(100,hp+8);score+=25;burst(d.x,d.y,'#4ff',10);
   }
  });
  drops=drops.filter(d=>!d.dead&&d.y<H+15);
-
- particles.forEach(p=>{
-  p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
- });
+ particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt});
  particles=particles.filter(p=>p.life>0);
-
- if(!boss&&level!==5&&level!==10&&waveSpawned>=waveLimit&&enemies.length===0){
-  nextLevel();
- }
+ if(!boss&&level!==5&&level!==10&&waveSpawned>=waveLimit&&enemies.length===0)nextLevel();
  updateHud();
 }
 
 function drawShip(){
  if(!ship)return;
  ctx.save();ctx.translate(ship.x,ship.y);
- if(ship.inv>0&&Math.floor(ship.inv/3)%2===0){
-  ctx.restore();return;
- }
- ctx.shadowBlur=18;ctx.shadowColor='#31eaff';
- ctx.fillStyle='#d9fbff';
- ctx.beginPath();
- ctx.moveTo(0,-20);ctx.lineTo(15,15);
- ctx.lineTo(0,9);ctx.lineTo(-15,15);
- ctx.closePath();ctx.fill();
- ctx.fillStyle='#09bce8';
- ctx.beginPath();ctx.moveTo(-5,13);
- ctx.lineTo(0,25+Math.random()*7);ctx.lineTo(5,13);ctx.fill();
+ if(ship.inv>0&&Math.floor(ship.inv/3)%2===0){ctx.restore();return}
+ ctx.shadowBlur=18;ctx.shadowColor='#31eaff';ctx.fillStyle='#d9fbff';
+ ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(15,15);ctx.lineTo(0,9);ctx.lineTo(-15,15);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#09bce8';ctx.beginPath();ctx.moveTo(-5,13);ctx.lineTo(0,25+Math.random()*7);ctx.lineTo(5,13);ctx.fill();
  ctx.restore();
 }
-
+function drawDemoShip(){
+ const x=W/2,y=H*.48;
+ ctx.save();ctx.translate(x,y);ctx.globalAlpha=.75;ctx.shadowBlur=22;ctx.shadowColor='#00eaff';ctx.fillStyle='#c9fcff';
+ ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(22,18);ctx.lineTo(0,10);ctx.lineTo(-22,18);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#09bce8';ctx.beginPath();ctx.moveTo(-6,16);ctx.lineTo(0,34);ctx.lineTo(6,16);ctx.fill();ctx.restore();
+}
 function draw(){
+ ctx.setTransform(dpr,0,0,dpr,0,0);
  ctx.fillStyle='#030613';ctx.fillRect(0,0,W,H);
- stars.forEach(s=>{
-  ctx.fillStyle=`rgba(135,220,255,${.3+s.s*.3})`;
-  ctx.fillRect(s.x,s.y,s.s,s.s*2);
- });
- if(mode==='menu'||mode==='gameover'||mode==='won'||mode==='paused'){
-  const t=performance.now()/1000;
-  ctx.save();ctx.globalAlpha=.45;
-  ctx.shadowBlur=22;ctx.shadowColor='#00eaff';
-  ctx.fillStyle='#c9fcff';
-  ctx.beginPath();
-  ctx.moveTo(W/2,H*.42+Math.sin(t)*5);
-  ctx.lineTo(W/2+24,H*.42+30);
-  ctx.lineTo(W/2,H*.42+22);
-  ctx.lineTo(W/2-24,H*.42+30);
-  ctx.closePath();ctx.fill();
-  ctx.restore();
- }
- bullets.forEach(b=>{
-  ctx.shadowBlur=12;ctx.shadowColor='#5ff';
-  ctx.fillStyle='#8ff';ctx.fillRect(b.x-2,b.y-8,4,10);
- });
- ctx.shadowBlur=0;
- enemies.forEach(e=>{
-  ctx.fillStyle='#ff526f';ctx.shadowBlur=12;ctx.shadowColor='#f35';
-  ctx.beginPath();ctx.moveTo(e.x,e.y+e.r);
-  ctx.lineTo(e.x-e.r,e.y-e.r);
-  ctx.lineTo(e.x+e.r,e.y-e.r);ctx.closePath();ctx.fill();
+ stars.forEach(s=>{ctx.fillStyle=`rgba(135,220,255,${.3+s.s*.3})`;ctx.fillRect(s.x,s.y,s.s,s.s*2)});
+ if(mode==='playing'||mode==='paused'){
+  bullets.forEach(b=>{ctx.shadowBlur=12;ctx.shadowColor='#5ff';ctx.fillStyle='#8ff';ctx.fillRect(b.x-2,b.y-8,4,10)});
   ctx.shadowBlur=0;
- });
- if(boss){
-  ctx.save();ctx.translate(boss.x,boss.y);
-  ctx.shadowBlur=25;ctx.shadowColor='#ff35d1';
-  ctx.fillStyle='#b72eae';ctx.beginPath();
-  ctx.moveTo(0,-34);ctx.lineTo(40,-8);
-  ctx.lineTo(29,28);ctx.lineTo(0,20);
-  ctx.lineTo(-29,28);ctx.lineTo(-40,-8);
-  ctx.closePath();ctx.fill();ctx.restore();
+  enemies.forEach(e=>{
+   ctx.fillStyle='#ff526f';ctx.shadowBlur=12;ctx.shadowColor='#f35';ctx.beginPath();ctx.moveTo(e.x,e.y+e.r);ctx.lineTo(e.x-e.r,e.y-e.r);ctx.lineTo(e.x+e.r,e.y-e.r);ctx.closePath();ctx.fill();ctx.shadowBlur=0;
+  });
+  if(boss){
+   ctx.save();ctx.translate(boss.x,boss.y);ctx.shadowBlur=25;ctx.shadowColor='#ff35d1';ctx.fillStyle='#b72eae';ctx.beginPath();
+   ctx.moveTo(0,-34);ctx.lineTo(40,-8);ctx.lineTo(29,28);ctx.lineTo(0,20);ctx.lineTo(-29,28);ctx.lineTo(-40,-8);ctx.closePath();ctx.fill();ctx.restore();
+  }
+  drops.forEach(d=>{ctx.shadowBlur=15;ctx.shadowColor='#0ff';ctx.fillStyle='#4ff';ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0});
+  particles.forEach(p=>{ctx.globalAlpha=Math.min(1,p.life/15);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3)});
+  ctx.globalAlpha=1;ctx.shadowBlur=0;drawShip();
+ }else{
+  ctx.shadowBlur=0;drawDemoShip();
  }
- drops.forEach(d=>{
-  ctx.shadowBlur=15;ctx.shadowColor='#0ff';ctx.fillStyle='#4ff';
-  ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fill();
-  ctx.shadowBlur=0;
- });
- particles.forEach(p=>{
-  ctx.globalAlpha=Math.min(1,p.life/15);
-  ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);
- });
- ctx.globalAlpha=1;drawShip();
 }
-
 function loop(now){
+ rafId=0;
  if(mode!=='playing')return;
- const dt=Math.min(2,(now-last)/16.67||1);
- last=now;
- update(dt);draw();
- if(mode==='playing')requestAnimationFrame(loop);
+ const dt=clamp((now-last)/16.67||1,0,2);
+ last=now;update(dt);draw();
+ if(mode==='playing')scheduleLoop();
 }
 
-reset();draw();
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden&&mode==='playing')showPaused();
+});
+
+// Important: size the canvas BEFORE creating the ship or drawing anything.
+// Without this initial resize, the default 300x150 canvas can stretch across the phone.
+resize();
+reset();
+showMainMenu();
+draw();
 })();
 </script>
 </body>
