@@ -1,48 +1,64 @@
-plugins {
-    id 'com.android.application'
-}
+name: Build Galaxy Striker APK
 
-def automaticVersionCode = providers.gradleProperty("versionCode")
-        .orElse("1")
-        .get()
-        .toInteger()
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
-def automaticVersionName = providers.gradleProperty("versionName")
-        .orElse("1.0.0")
-        .get()
+permissions:
+  contents: read
 
-def signingKeyPath = System.getenv("KEYSTORE_PATH")
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-def signingKeyPassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-def signingAlias = System.getenv("KEY_ALIAS") ?: "galaxystriker"
-def signingPassword = System.getenv("KEY_PASSWORD") ?: ""
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-android {
-    namespace 'com.galaxystriker.game'
-    compileSdk 35
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-    defaultConfig {
-        applicationId 'com.galaxystriker.game'
-        minSdk 23
-        targetSdk 28
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-        versionCode automaticVersionCode
-        versionName automaticVersionName
-    }
+      - name: Decode stable release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "Missing GitHub Actions secret: KEYSTORE_BASE64"
+            exit 1
+          fi
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/galaxy-striker-release.jks"
+          echo "KEYSTORE_PATH=$RUNNER_TEMP/galaxy-striker-release.jks" >> "$GITHUB_ENV"
 
-    signingConfigs {
-        release {
-            storeFile file(signingKeyPath ?: "${rootDir}/galaxy-striker-release.jks")
-            storePassword signingKeyPassword
-            keyAlias signingAlias
-            keyPassword signingPassword
-        }
-    }
+      - name: Build signed release APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_PASSWORD" || { echo "Missing KEYSTORE_PASSWORD secret"; exit 1; }
+          test -n "$KEY_ALIAS" || { echo "Missing KEY_ALIAS secret"; exit 1; }
+          test -n "$KEY_PASSWORD" || { echo "Missing KEY_PASSWORD secret"; exit 1; }
+          gradle assembleRelease \
+            -PversionCode=${{ github.run_number }} \
+            -PversionName=1.0.${{ github.run_number }}
 
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-        }
-    }
-}
+      - name: Rename APK
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk \
+             "app/build/outputs/apk/release/Galaxy-Striker-v1.0.${{ github.run_number }}.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Galaxy-Striker-v1.0.${{ github.run_number }}
+          path: app/build/outputs/apk/release/Galaxy-Striker-v1.0.${{ github.run_number }}.apk
+          if-no-files-found: error
+          retention-days: 30
